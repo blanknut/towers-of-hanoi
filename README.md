@@ -3,7 +3,7 @@
 An animated solution of the "Towers of Hanoi" puzzle with up to seven disks
 for the HP-42S pocket calculator.
 
-![](hanoi4s.gif)
+![](hanoi42s.gif)
 
 ## Installation
 
