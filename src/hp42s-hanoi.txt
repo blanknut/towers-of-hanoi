@@ -1,0 +1,298 @@
+{ 262-Byte Prgm }
+
+;----------------------------------------------------------
+; Towers of Hanoi
+
+001 § LBL "HANOI"
+
+; ask user to enter number of disks and limit it to
+; the supported range [1..7]
+
+002   INPUT "DISKS"
+003   7
+004   X>Y?
+005   X<>Y
+006   1
+007   X<Y?
+008   X<>Y
+009   STO "DISKS"
+
+010   STO 08             ; current disk size
+
+; smallest disk is moved to the right if number of disks
+; is even, otherwise it is moved to the left
+
+011   1
+012   AND
+013   LASTX
+014   +
+015   STO 07
+
+; disk 8 represents the basement and acts as a sentinel
+; when moving disks
+
+016   8
+017   STO 00
+018   STO 01
+019   STO 02
+
+; initialize other data registers to zero
+
+020   CLX
+021   STO 03
+022   STO 04
+023   STO 05
+024   STO 06
+025   STO 09
+
+; set default AGRAPH mode
+
+026   CF 34
+027   CF 35
+
+; draw basement
+
+028   CLLCD
+029   -15
+030   X<>Y
+031   PIXEL
+032   -16
+033   X<>Y
+034   PIXEL
+
+; set up initial tower
+
+035 § LBL 00
+036   XEQ 04
+037   XEQ 02
+038   DSE 08
+039   GTO 00
+
+; start solving puzzle
+
+040   TONE 3
+041   TONE 1
+042   GTO 08
+
+;----------------------------------------------------------
+; remove disk of size R08 from pile R09
+
+043 § LBL 01
+
+; erase disk
+
+044   SF 34
+045   XEQ 03
+
+; decrease tower height
+
+046   RCL 09
+047   3
+048   +
+049   DSE IND ST X
+050   CLX
+
+; update tower configuration
+; (4 bits per disk)
+
+051   RCL IND 09
+052   16
+053   ÷
+054   IP
+055   STO IND 09
+
+056   RTN
+
+;----------------------------------------------------------
+; put disk of size R08 onto pile R09
+
+057 § LBL 02
+
+; update tower configuration
+; (4 bits per disk)
+
+058   RCL IND 09
+059   16
+060   x
+061   RCL 08
+062   +
+063   STO IND 09
+
+; increase tower height
+
+064   RCL 09
+065   3
+066   +
+067   ISG IND ST X
+068   CLX
+
+; draw disk and return
+
+069   CF 34
+
+;----------------------------------------------------------
+; draw topmost disk of size R08 on pile R09
+; assumes ALPHA register contains disk pattern
+; SF 34, CF 35 will erase the disk
+
+070 § LBL 03
+
+; compute display row
+; r := 15 - 2h(p)
+
+071   RCL 09
+072   3
+073   +
+074   15
+075   RCL IND ST Y
+076   ENTER
+077   +
+078   -
+
+; compute display column
+; c := 35p + 31 - 2s
+
+079   RCL 09
+080   35
+081   x
+082   31
+083   +
+084   RCL 08
+085   ENTER
+086   +
+087   -
+
+; finally, draw the disk
+
+088   AGRAPH
+089   RTN
+
+;----------------------------------------------------------
+; build string for drawing disk of size R08
+
+090 § LBL 04
+
+; width of disk in pixels := 4s + 1
+
+091   "x"                ; hex 01
+092   RCL 08
+093   LBL 05
+094   |-"xxxx"           ; hex 01 01 01 01
+095   DSE ST X
+096   GTO 05
+
+097   RTN
+
+;----------------------------------------------------------
+; main loop
+
+098 § LBL 06
+
+; determine the one and only possible move after the
+; smallest disk has been moved
+
+; get indices of piles next to smallest disk
+
+099   RCL 06
+100   1
+101   +
+102   3
+103   MOD
+104   STO 09
+
+105   1
+106   +
+107   3
+108   MOD
+109   STO 10
+
+; get sizes of topmost disks on these piles
+
+110   RCL IND 09
+111   15
+112   AND
+113   STO 08
+
+114   LASTX
+115   RCL IND 10
+116   AND
+
+; test which move is legal
+
+117   X>Y?
+118   GTO 07
+
+; move disk from pile R10 to pile R09
+
+119   STO 08
+120   RCL 10
+121   X<> 09
+122   STO 10
+
+; move disk from pile R09 to pile R10
+
+123 § LBL 07
+124   XEQ 04
+125   XEQ 01
+126   RCL 10
+127   STO 09
+128   XEQ 02
+
+129 § LBL 08
+
+; remove smallest disk
+
+130   1
+131   STO 08
+132   RCL 06
+133   STO 09
+134   XEQ 04
+135   XEQ 01
+
+; move it to the next pile
+
+136   RCL 06
+137   RCL 07
+138   +
+139   3
+140   MOD
+141   STO 06
+142   STO 09
+143   XEQ 02
+
+; puzzle solved if all disk are on target pile
+
+144   RCL "DISKS"
+145   RCL 05
+146   X<Y?
+147   GTO 06
+
+148   TONE 5
+149   TONE 8
+150   END
+
+Register Usage
+--------------
+R00   configuration of tower 1
+R01   configuration of tower 2
+R02   configuration of tower 3
+R03   height of tower 1
+R04   height of tower 2
+R05   height of tower 3
+R06   pile with smallest disk
+R07   smallest disk move
+R08   current disk
+R09   current pile
+R10   destination pile
+
+Definitions
+-----------
+s     size of disk [1..7]
+p     pile number [0..2]
+h     height of pile p
+w     width of disk in pixels
+      w := 4s + 1
+r     display row of topmost disk on pile p
+      r := 15 - 2h
+c     display column of topmost disk on pile p
+      c := 35p + 31 - 2s
