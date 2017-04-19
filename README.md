@@ -34,8 +34,3 @@ This is already done in the .raw file.
 
 I originally published this program on my HP calculator blog, see
 [T&uuml;rme von Hanoi f&uuml;r HP-42S](http://calc.fjk.ch/turme-von-hanoi-fur-hp-42s/).
-
-## History
-
- * 1.0.0
-     * Initial release.
