@@ -30,6 +30,23 @@ When running the program on Free42 you have to insert a pause at step 89, right
 after the call to AGRAPH. Otherwise you will not see the disks moving around.
 This is already done in the .raw file.
 
+## Update - DM42 Version
+
+I've now implemented a version for the
+[SwissMicros DM42}(https://www.swissmicros.com/product/dm42), too.
+It uses GrMod 2 (200x120 pixel) and handles up to 15 disks. Instead of
+encoding the pile states in numbers, it uses a matrix. I've just adapted
+the original HP-42S program so maybe the code is not very clean and optimized.
+
+Usage is the same, just the program name changed and the maximum number of
+disks is 15:
+
+  * XEQ "HANOIX"
+  * Enter the number of disks (1..15).
+  * Press R/S.
+
+![](dm42-hanoi.jpg)
+
 ## References
 
 I originally published this program on my HP calculator blog, see

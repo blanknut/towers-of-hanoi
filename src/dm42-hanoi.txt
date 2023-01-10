@@ -1,0 +1,307 @@
+{ 297-Byte Prgm }
+
+;----------------------------------------------------------
+; Towers of Hanoi
+
+001 § LBL "HANOIX"
+
+; ask user to enter number of disks and limit it to
+; the supported range [1..7]
+
+002   INPUT "DISKS"
+003   15
+004   X>Y?
+005   X<>Y
+006   1
+007   STO 04
+008   X<Y?
+009   X<>Y
+010   STO "DISKS"
+
+; initialize pile matrix
+
+011   STO 00
+012   RCL 04
+013   +
+014   3
+015   STO 05
+016   DIM "PILE"
+017   INDEX "PILE"       ; (DISKS+1) x 3 matrix
+      
+018   RCL 04
+019   RCL 05
+020   STOIJ
+
+; disk DISKS+1 represents the basement and acts as a sentinel
+; when moving disks
+021   RCL ST T           ; DISKS+1 := sentinel      
+022   STOEL
+023   J-
+024   STOEL
+025   J-
+026   STOEL
+
+; smallest disk is moved to the right if number of disks
+; is even, otherwise it is moved to the left
+
+027   RCL 00
+028   RCL 04
+029   AND
+030   LASTX
+031   +
+032   STO 07
+
+; initialize other data registers to zero
+
+033   RCL 04
+034   STO 01
+035   STO 02
+036   STO 03
+037   STO 06
+038   STO 08
+
+; DM42 Graphics Mode 2 (200x120)
+
+039   2
+040   STO "GrMod"
+      
+; set default AGRAPH mode
+
+041   CF 34
+042   CF 35
+
+; draw basement
+      
+043   CLLCD
+044   -115
+045   ENTER
+046   CLX
+047   PIXEL
+048   ISG ST Y
+049   PIXEL
+
+; set up initial tower
+
+050 § LBL 00
+051   XEQ 04
+052   XEQ 02
+053   DSE 00
+054   GTO 00
+
+; start solving puzzle
+
+055   TONE 3
+056   TONE 1
+057   GTO 08
+
+;----------------------------------------------------------
+; remove top disk of size R00 from pile R08
+
+058 § LBL 01
+
+; erase disk
+
+059   SF 34
+060   XEQ 03
+
+; update pile
+
+061   RCL IND 08         ; pile height := index of top disk
+062   RCL 08             ; pile
+063   STOIJ
+064   CLX
+065   STOEL
+
+; decrease tower height
+
+066   DSE IND 08
+
+067   RTN
+
+;----------------------------------------------------------
+; put disk of size R00 onto pile R08
+
+068 § LBL 02
+
+; increase tower height
+
+069   ISG IND 08
+070   CLX 
+
+; update pile
+
+071   RCL IND 08         ; pile height := index of top disk
+072   RCL 08             ; pile
+073   STOIJ
+074   RCL 00
+075   STOEL
+
+; draw disk and return
+
+076   CF 34
+
+;----------------------------------------------------------
+; draw topmost disk of size R00 on pile R08
+; assumes ALPHA register contains disk pattern
+; SF 34, CF 35 will erase the disk
+
+077 § LBL 03
+
+; compute display row
+
+078   120
+079   RCL IND 08
+080   6
+081   *
+002   -
+
+; compute display column
+
+083   RCL 08
+084   65
+085   x
+086   30
+087   -
+088   RCL 00
+089   ENTER
+090   +
+091   -
+
+; finally, draw the disk
+
+092   AGRAPH
+093   RCL 00
+094   +
+095   AGRAPH
+096   RCL 00
+097   +
+098   AGRAPH
+099   RCL 00
+100   +
+101   AGRAPH
+102   PSE
+103   RTN
+
+;----------------------------------------------------------
+; build string for drawing disk of size R00
+
+104 § LBL 04
+105   CLA
+106   RCL 00
+107 § LBL 05
+108   |-"→"            ; hex 15
+109   DSE ST X
+110   GTO 05
+111   RTN
+
+;----------------------------------------------------------
+; main loop
+
+112 § LBL 06
+
+; determine the one and only possible move after the
+; smallest disk has been moved
+
+; get indices of piles next to smallest disk
+
+113   RCL 06
+114   RCL 05
+115   MOD
+116   RCL 04
+117   +
+118   STO 08
+
+119   RCL 05
+120   MOD
+121   RCL 04
+122   +
+123   STO 09
+
+; get sizes of topmost disks on these piles
+
+124   RCL IND 08
+125   RCL 08
+126   STOIJ
+127   RCLEL
+128   STO 00
+
+129   RCL IND 09
+130   RCL 09
+131   STOIJ
+132   RCL 00
+133   RCLEL
+
+; test which move is legal
+
+134   X>Y?
+135   GTO 07
+
+; move disk from pile R09 to pile R08
+
+136   STO 00
+137   RCL 09
+138   X<> 08
+139   STO 09
+
+; move disk from pile R08 to pile R09
+
+140 § LBL 07
+141   XEQ 04
+142   XEQ 01
+143   RCL 09
+144   STO 08
+145   XEQ 02
+
+146 § LBL 08
+
+; remove smallest disk
+
+147   RCL 04
+148   STO 00
+149   RCL 06
+150   STO 08
+151   XEQ 04
+152   XEQ 01
+
+; move it to the next pile
+
+153   RCL 06
+154   RCL 04
+155   -
+156   RCL 07
+157   +
+158   RCL 05
+159   MOD
+160   RCL 04
+161   +
+162   STO 06
+163   STO 08
+164   XEQ 02
+
+; puzzle solved if all disk are on target pile
+
+165   RCL 03
+166   RCL "DISKS"
+167   X>Y?
+168   GTO 06
+
+169   TONE 5
+170   TONE 8
+171   END
+
+
+Register Usage
+--------------
+R00   size of current disk
+R01   height of pile 1
+R02   height of pile 2
+R03   height of pile 3
+R04   constant 1
+R05   constant 3
+R06   pile with smallest disk
+R07   smallest disk move
+R08   current pile
+R09   destination pile
+
+DISKS total number of disks
+PILE  pile matrix, dimension 3 x DISKS+1
