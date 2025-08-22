@@ -1,0 +1,110 @@
+100 ! -------------------------
+105 ! Towers of Hanoi
+110 ! for HP-85
+115 ! Aug 2021, J. Keller
+120 ! -------------------------
+125 !
+130 OPTION BASE 0
+135 INTEGER H(3),T(3,11)
+140 INTEGER N,M,S,I
+145 INTEGER T0,H0,T1,T2,T3
+150 INTEGER D,D1,D2
+155 INTEGER X1,Y,X2,Y2
+160 INTEGER G0,G1,G2,G3,G4
+199 !
+200 DISP "Number of disks";
+205 INPUT N
+210 IF N<1 THEN 200
+215 IF N>10 THEN 200
+220 GOSUB 800
+225 GOSUB 700
+296 !
+297 ! Main loop:
+298 ! Move smallest disk
+300 T1=S @ T2=(T1+M) MOD 3
+305 GOSUB 500
+310 IF H(T2)=N THEN 998
+315 S=T2
+318 !
+319 ! Move other disk
+320 T1=(S+1) MOD 3
+325 T2=(S+2) MOD 3
+330 D1=T(T1,H(T1))
+335 D2=T(T2,H(T2))
+340 IF D1<D2 THEN 350
+345 T3=T1 @ T1=T2 @ T2=T3
+350 GOSUB 500
+355 GOTO 300
+498 !
+499 ! Move disk from T1 to T2
+500 T0=T1 @ H0=H(T0)
+505 GOSUB 660
+510 D=T(T1,H(T1))
+515 T(T1,H(T1))=0
+520 H(T1)=H(T1)-1
+525 H(T2)=H(T2)+1
+530 T(T2,H(T2))=D
+535 T0=T2 @ H0=H(T2)
+540 GOSUB 650
+545 RETURN
+598 !
+599 ! Draw disk
+600 D=4*(10-T(T0,H0))
+605 X1=G1+T0*(G0+G1)+D
+610 X2=X1+G0-2*D
+615 Y2=G2+H0*(G3+G4)
+620 Y1=Y2-G4
+625 MOVE X1,Y1 @ DRAW X1,Y2
+630 DRAW X2,Y2 @ DRAW X2,Y1
+635 DRAW X1,Y1
+640 RETURN
+648 !
+649 ! Draw disk (T0,H0)
+650 PEN 1 @ GOSUB 600
+655 RETURN
+658 !
+659 ! Erase disk (T0,H0)
+660 PEN -1 @ GOSUB 600
+665 RETURN
+698 !
+699 ! Draw initial scene
+700 GCLEAR @ GRAPH
+705 SCALE 0,255,0,191
+709 ! graphics constants:
+710 ! disk width
+711 ! gap between towers
+712 ! basement height
+713 ! gap between disks
+714 ! disk height
+715 G0=80
+720 G1=4
+725 G2=20
+730 G3=4
+735 G4=7
+739 !
+740 MOVE 0,G2
+745 DRAW 255,G2
+750 T0=0
+755 FOR H0=1 TO H(T0)
+760 GOSUB 650
+765 NEXT H0
+770 RETURN
+798 !
+799 ! Setup initial towers
+800 H(0)=N @ H(1)=0 @ H(2)=0
+804 ! T(X, 0): sentinel
+805 T(0,0)=N+1
+810 T(1,0)=T(0,0)
+815 T(2,0)=T(0,0)
+820 FOR I=1 TO N
+825 T(0,I)=N+1-I
+830 T(1,I)=0 @ T(2,I)=0
+835 NEXT I
+837 ! Smallest disk
+838 ! S:=position
+839 ! M:=move distance
+840 S=0 @ M=ABS(N MOD 2-2)
+845 RETURN
+997 !
+998 ALPHA
+999 END

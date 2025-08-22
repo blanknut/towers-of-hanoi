@@ -5,11 +5,14 @@ for the HP-42S pocket calculator.
 
 ![](hanoi42s.gif)
 
+Note: In the meantime, I've also implemented it for the SwissMicros DM42 as well
+as for the HP-85, see further below.
+
 ## Installation
 
-If you have a real HP-42S calculator, type in the program in ./src/hp42s-hanoi.txt.
+If you have a real HP-42S calculator, type in the program in `./src/hp42s-hanoi.txt`.
 If you want to run it on [Free42](http://thomasokken.com/free42/), simply import
-./bin/hp42s-hanoi.raw.
+`./bin/hp42s-hanoi.raw`.
 
 ## Usage
 
@@ -46,6 +49,17 @@ disks is 15:
   * Press R/S.
 
 ![](dm42-hanoi.jpg)
+
+## Update - HP-85 Version
+
+I've now implemented a version for the HP-85. You can either type in the
+program in `./src/hp85-hanoi.txt' or use Everet Kaser's great
+[HP-85 emulator](https://www.kaser.com/hp85.html) and mount the disk image
+`./bin/HP85-HANOI`.
+
+Then, simply run the program and enter the number of disks (1..10) and
+enjoy. Configure the emulator to run at natural (slower) speed, otherwise
+it runs too fast.
 
 ## References
 
