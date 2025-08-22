@@ -53,13 +53,12 @@ disks is 15:
 ## Update - HP-85 Version
 
 I've now implemented a version for the HP-85. You can either type in the
-program in `./src/hp85-hanoi.txt' or use Everet Kaser's great
+program in `./src/hp85-hanoi.txt` or use Everet Kaser's great
 [HP-85 emulator](https://www.kaser.com/hp85.html) and mount the disk image
 `./bin/HP85-HANOI`.
 
-Then, simply run the program and enter the number of disks (1..10) and
-enjoy. Configure the emulator to run at natural (slower) speed, otherwise
-it runs too fast.
+Then, simply run the program, enter the number of disks (1..10) and enjoy.
+Configure the emulator to run at natural (slower) speed, otherwise it runs too fast.
 
 ## References
 
